@@ -185,8 +185,9 @@
 		//const color = 0x72eb99;
 		const color = 0x2102cf;
 		//const color = 0x000000;
-		const near = 3;
-		const far = 14;
+		var distance = camera.position.distanceTo( new THREE.Vector3(0,0,0) );
+		const near = distance + 3;
+		const far = distance + 14;
 		scene.fog = new THREE.Fog(color, near, far);
 
 		onRenderFcts.push(function (delta) {
