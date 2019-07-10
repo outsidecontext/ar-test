@@ -112,14 +112,16 @@
 		sidePanelTexture.wrapS = THREE.RepeatWrapping;
 		sidePanelTexture.wrapT = THREE.RepeatWrapping;
 		sidePanelTexture.repeat.set(1, 3);
-		var sidePanelMaterial = new THREE.MeshBasicMaterial({
+		var sidePanelMaterial = new THREE.MeshLambertMaterial({
+			transparent: true,
 			map: sidePanelTexture,
 			side: THREE.BackSide
 		});
 
 		const rearPanelTexture = new THREE.TextureLoader().load('./data/RearPlane.png');
 		rearPanelTexture.repeat.set(1, 1);
-		var rearPanelMaterial = new THREE.MeshBasicMaterial({
+		var rearPanelMaterial = new THREE.MeshLambertMaterial({
+			transparent: true,
 			map: rearPanelTexture,
 			side: THREE.BackSide
 		});
@@ -141,17 +143,51 @@
 		// Left, Right, Bottom, Top, Back
 		setPlane(0, Math.PI * 0.5, -Math.PI * 0.5, sidePanelMaterial);
 		setPlane(0, -Math.PI * 0.5, Math.PI * 0.5, sidePanelMaterial);
-		setPlane(Math.PI * 0.5, 0, 0, sidePanelMaterial);
+		setPlane(Math.PI * 0.5, Math.PI, 0, sidePanelMaterial);
 		setPlane(-Math.PI * 0.5, 0, 0, sidePanelMaterial);
 		setPlane(0, Math.PI, 0, rearPanelMaterial);
 		var time = 0;
 
+		// the invisibility cloak (plane with a hole)
+		let loader = new THREE.TextureLoader();
+		let material0 = new THREE.MeshBasicMaterial({
+			color: 0xff0000,
+			colorWrite: false
+		});
+		// Top Mask
+		var planeGeom = new THREE.PlaneGeometry(4, 2, 1, 1);
+		planeGeom.rotateX(-Math.PI * 0.5);
+		planeGeom.translate(0, 0, (boxHeight*0.5) + 1);
+		var plane = new THREE.Mesh(planeGeom, material0);
+		scene.add(plane);
+		// Bottom Mask
+		planeGeom = new THREE.PlaneGeometry(4, 2, 1, 1);
+		planeGeom.rotateX(-Math.PI * 0.5);
+		planeGeom.translate(0, 0, (-boxHeight*0.5) - 1);
+		plane = new THREE.Mesh(planeGeom, material0);
+		scene.add(plane);
+		// Left Mask
+		planeGeom = new THREE.PlaneGeometry(2, boxHeight, 1, 1);
+		planeGeom.rotateX(-Math.PI * 0.5);
+		planeGeom.translate((-boxWidth*0.5)-1, 0, 0);
+		plane = new THREE.Mesh(planeGeom, material0);
+		scene.add(plane);
+		// Right Mask
+		planeGeom = new THREE.PlaneGeometry(2, boxHeight, 1, 1);
+		planeGeom.rotateX(-Math.PI * 0.5);
+		planeGeom.translate((boxWidth*0.5)+1, 0, 0);
+		plane = new THREE.Mesh(planeGeom, material0);
+		scene.add(plane);
+
+
+		let ambientLight = new THREE.AmbientLight(0xcccccc, 1.0);
+		scene.add(ambientLight);
+
 		onRenderFcts.push(function (delta) {
 			time += delta * 1;
 			const sinAnimate = Math.sin(time);
-			sidePanelTexture.offset.y += 0.01;
-			//group.rotation.y = sinAnimate * 0.5;
-			group.scale.z = (sinAnimate + 1) * 2;
+			sidePanelTexture.offset.y += 0.03;
+			group.scale.z = (sinAnimate + 1) * 5;
 			// positions
 			group.position.y = - group.scale.z * 0.5;
 		})
