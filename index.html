@@ -28,6 +28,8 @@
 
 		// init scene and camera
 		var scene = new THREE.Scene();
+		var timeout = 0;
+		var progress = 0;
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//		Initialize a basic camera
@@ -82,7 +84,19 @@
 			if (arToolkitSource.ready === false) return
 			arToolkitContext.update(arToolkitSource.domElement)
 			// update scene.visible if the marker is seen
-			scene.visible = camera.visible
+			scene.visible = camera.visible;
+			if (!scene.visible)
+			{
+				timeout++;
+				if (timeout > 100)
+				{
+					progress = 0;
+				}
+			}
+			else
+			{
+				timeout = 0;
+			}
 		})
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -182,35 +196,38 @@
 
 		let ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
 		scene.add(ambientLight);
-		//const color = 0x72eb99;
-		const color = 0x2102cf;
-		//const color = 0x000000;
+		//const fogColour = 0x72eb99;
+		//const fogColour = 0x2102cf;
+		const fogColour = 0x000000;
 
 		onRenderFcts.push(function (delta) {
-			time += delta * 1;
-			var sinAnimate = Math.sin(time);
-			sidePanelTexture.offset.y += 0.06;
-			group.scale.z = (sinAnimate + 1) * 5;
-			// positions
-			group.position.y = - group.scale.z * 0.5;
+			//time += delta * 1;
+			//var animationPercent = (Math.sin(time) + 1 ) * 0.5;
+			progress += delta * 2;
+			var animationPercent = progress;
 
+			sidePanelTexture.offset.y += 0.06;
+			group.scale.z = animationPercent;
+			group.position.y = - group.scale.z * 0.5;
+			/*
 			var tintColour = new THREE.Color();
-			tintColour.r = THREE.Math.lerp(0, .447058824, (sinAnimate + 1) * 0.5);
-			tintColour.g = THREE.Math.lerp(0, .921568627, (sinAnimate + 1) * 0.5);
-			tintColour.b = THREE.Math.lerp(0, .6, (sinAnimate + 1) * 0.5);
+			tintColour.r = THREE.Math.lerp(0, .447058824, animationPercent);
+			tintColour.g = THREE.Math.lerp(0, .921568627, animationPercent);
+			tintColour.b = THREE.Math.lerp(0, .6, animationPercent);
 			rearPanelMaterial.emissive = tintColour;
 			sidePanelMaterial.emissive = tintColour;
 			
 			var lightColour = new THREE.Color();
-			lightColour.r = THREE.Math.lerp(1, .447058824, (sinAnimate + 1) * 0.5);
-			lightColour.g = THREE.Math.lerp(1, .921568627, (sinAnimate + 1) * 0.5);
-			lightColour.b = THREE.Math.lerp(1, .6, (sinAnimate + 1) * 0.5);
+			lightColour.r = THREE.Math.lerp(1, .447058824, animationPercent);
+			lightColour.g = THREE.Math.lerp(1, .921568627, animationPercent);
+			lightColour.b = THREE.Math.lerp(1, .6, animationPercent);
 			ambientLight.color = lightColour;
+			*/
 
-			//var distance = camera.position.distanceTo( new THREE.Vector3(0,0,0) );
-			//const near = distance + 2;
-			//const far = distance + 9;
-			//scene.fog = new THREE.Fog(color, near, far);
+			var distance = camera.position.distanceTo( new THREE.Vector3(0,0,0) );
+			const near = distance - 1;
+			const far = distance + 9;
+			scene.fog = new THREE.Fog(fogColour, near, far);
 		})
 
 		//////////////////////////////////////////////////////////////////////////////////
