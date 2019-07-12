@@ -30,6 +30,7 @@
 		var scene = new THREE.Scene();
 		var timeout = 0;
 		var progress = 0;
+		var speed = 0;
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//		Initialize a basic camera
@@ -91,6 +92,7 @@
 				if (timeout > 100)
 				{
 					progress = 0;
+					speed = 0;
 				}
 			}
 			else
@@ -203,8 +205,9 @@
 		onRenderFcts.push(function (delta) {
 			//time += delta * 1;
 			//var animationPercent = (Math.sin(time) + 1 ) * 0.5;
-			progress += delta * 2;
-			var animationPercent = progress;
+			speed = THREE.Math.clamp(speed + 0.1, 0, 2);
+			progress += delta * speed;
+			var animationPercent = THREE.Math.clamp(progress, 0, 10);
 
 			sidePanelTexture.offset.y += 0.06;
 			group.scale.z = animationPercent;
